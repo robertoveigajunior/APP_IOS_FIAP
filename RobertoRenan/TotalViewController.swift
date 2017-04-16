@@ -7,29 +7,49 @@
 //
 
 import UIKit
+import CoreData
 
 class TotalViewController: UIViewController {
 
+    @IBOutlet weak var tfDolarTotal: UILabel!
+    @IBOutlet weak var tfRealTotal: UILabel!
+    
+    var dataSource = [Product]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadProducts()
     }
-    */
-
+    
+    func loadProducts() {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        do {
+            try dataSource = context.fetch(fetchRequest)
+            setLabels()
+        } catch {
+            print("erro")
+        }
+    }
+    
+    func dolarTotal() -> String {
+        let total = String(dataSource.map({$0.price}).reduce(0,+))
+        return total
+    }
+    
+    func realTotal() -> String {
+        let dolar = UserDefaults.standard.double(forKey: SettingsType.dolar.rawValue)
+        let total = String((dataSource.map({$0.price}).reduce(0,+))*dolar)
+        return total
+    }
+    
+    func setLabels() {
+        tfDolarTotal.text = dolarTotal()
+        tfRealTotal.text = realTotal()
+    }
 }

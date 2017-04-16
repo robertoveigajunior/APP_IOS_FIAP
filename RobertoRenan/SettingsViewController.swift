@@ -7,6 +7,12 @@
 //
 
 import UIKit
+import CoreData
+
+enum SettingsType: String {
+    case dolar = "dolar"
+    case iof = "iof"
+}
 
 class SettingsViewController: UIViewController {
 
@@ -14,29 +20,67 @@ class SettingsViewController: UIViewController {
     @IBOutlet weak var tfDolarQuote: UITextField!
     @IBOutlet weak var tfIOF: UITextField!
     
-    var list = [State]()
+    
+    var dataSource = [State]()
     var toolbar = UIToolbar()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
+        tableView.dataSource = self
+        tfDolarQuote.tintColor = .black
+        tfIOF.tintColor = .black
         setToolBar()
+        loadStates()
+        loadTax()
+    }
+    @IBAction func addNewState(_ sender: UIButton) {
+        newState()
     }
 }
 
+//MARK: - Methods
 extension SettingsViewController {
+    func loadTax() {
+        if let dolar = UserDefaults.standard.string(
+            forKey: SettingsType.dolar.rawValue){
+            tfDolarQuote.text = dolar
+        }
+        if let iof = UserDefaults.standard.string(forKey: SettingsType.iof.rawValue){
+            tfIOF.text = iof
+        }
+    }
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
+    func loadStates() {
+        dataSource.removeAll()
+        let fetchRequest: NSFetchRequest<State> = State.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        do {
+            try dataSource = context.fetch(fetchRequest)
+            tableView.reloadData()
+        } catch {
+            print("erro")
+        }
+    }
+    
     func setToolBar() {
         toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 44))
         let btCancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-        let btSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let btOk = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(newState))
+       let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let btEdit = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
         
-        toolbar.items = [btCancel, btSpace, btOk]
+        toolbar.items = [btCancel,space,btEdit]
+        tfDolarQuote.inputAccessoryView = toolbar
         tfIOF.inputAccessoryView = toolbar
     }
     
     func newState() {
-        let state = State()
+        let state = State(context: context)
         let alert = UIAlertController(title: "Novo", message: "Novo Estado", preferredStyle: .alert)
         
         alert.addTextField { (textField) in
@@ -45,6 +89,7 @@ extension SettingsViewController {
         
         alert.addTextField { (textField) in
             textField.placeholder = "Taxa de Imposto"
+            textField.keyboardType = .decimalPad
         }
         
         let okAction = UIAlertAction(title: "Salvar", style: .default) { (action) in
@@ -52,10 +97,7 @@ extension SettingsViewController {
             state.tax = Double(alert.textFields![1].text!)!
             do {
                 try self.context.save()
-                
-                self.tfDolarQuote.text = ""
-                self.tfIOF.text = ""
-                
+                self.loadStates()
             } catch {
                 let alert = UIAlertController(title: "", message: "", preferredStyle: .alert)
                 self.present(alert,animated: true, completion: nil)
@@ -71,23 +113,26 @@ extension SettingsViewController {
     }
     
     func cancel() {
+        self.becomeFirstResponder()
+    }
+    
+    func edit() {
         if tfDolarQuote.isFirstResponder {
-            tfDolarQuote.resignFirstResponder()
+            UserDefaults.standard.set(tfDolarQuote.text, forKey: SettingsType.dolar.rawValue)
+            self.becomeFirstResponder()
         }
-        if tfDolarQuote.isFirstResponder {
-            tfIOF.resignFirstResponder()
+        if tfIOF.isFirstResponder {
+            UserDefaults.standard.set(tfIOF.text, forKey: SettingsType.iof.rawValue)
+            self.becomeFirstResponder()
         }
     }
     
     func delete(indexPath: IndexPath) {
-        
-        let state = list[indexPath.row] as State
+        let state = dataSource[indexPath.row] as State
         self.context.delete(state)
         try! self.context.save()
-        
-        list.remove(at: indexPath.row)
+        dataSource.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .fade)
-        
     }
     
     func isEmptyList(_ empty: Bool) {
@@ -105,18 +150,13 @@ extension SettingsViewController: UITableViewDelegate {
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Deletar") { (action, indexPath) in
             self.delete(indexPath: indexPath)
         }
-        
-//        let editAction = UITableViewRowAction(style: .default, title: "Editar") { (action, indexPath) in
-//            self.showEditAlert(task: self.list[indexPath.row])
-//        }
-        
         return [deleteAction]
     }
 }
 
 extension SettingsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let listCount = list.count
+        let listCount = dataSource.count
         if listCount == 0 {
             isEmptyList(true)
             return 0
@@ -127,6 +167,9 @@ extension SettingsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellState", for: indexPath)
+        let state = dataSource[indexPath.row]
+        cell.textLabel?.text = state.name
+        cell.detailTextLabel?.text = "\(String(state.tax)) %"
         return cell
     }
 }

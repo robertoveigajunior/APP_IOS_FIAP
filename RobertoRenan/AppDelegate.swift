@@ -16,10 +16,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        self.window?.tintColor = .white
+        self.window?.tintColor = #colorLiteral(red: 0.2785082757, green: 0.6733700037, blue: 0.9769743085, alpha: 1)
         var appDefaults = [String: Any]()
-        appDefaults[Constants.COTACAODOLAR.rawValue] = 3.2
-        appDefaults[Constants.IOF.rawValue] = 6.38
+        appDefaults[SettingsType.dolar.rawValue] = 3.2
+        appDefaults[SettingsType.iof.rawValue] = 6.38
         UserDefaults.standard.register(defaults: appDefaults)
         return true
     }

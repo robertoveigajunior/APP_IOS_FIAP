@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		40B045841EA2CFA400B3F5DB /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40B045831EA2CFA300B3F5DB /* Extensions.swift */; };
+		40B045861EA30AD900B3F5DB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 40B045851EA30AD900B3F5DB /* Settings.bundle */; };
 		696135E21E86391C007EF922 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696135E11E86391C007EF922 /* RegisterViewController.swift */; };
 		696135E41E863AA7007EF922 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696135E31E863AA7007EF922 /* SettingsViewController.swift */; };
 		69656D711E861C8C0013F271 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69656D701E861C8C0013F271 /* AppDelegate.swift */; };
@@ -22,6 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		40B045831EA2CFA300B3F5DB /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		40B045851EA30AD900B3F5DB /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		696135E11E86391C007EF922 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		696135E31E863AA7007EF922 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		69656D6D1E861C8C0013F271 /* RobertoRenan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RobertoRenan.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +85,8 @@
 				69B721E31E88A03C00EE43EF /* DBmodel.xcdatamodeld */,
 				69B721E61E8E01D500EE43EF /* UIViewController+CoreData.swift */,
 				69B721E81E8E12B700EE43EF /* Constants.swift */,
+				40B045831EA2CFA300B3F5DB /* Extensions.swift */,
+				40B045851EA30AD900B3F5DB /* Settings.bundle */,
 			);
 			path = RobertoRenan;
 			sourceTree = "<group>";
@@ -145,6 +151,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40B045861EA30AD900B3F5DB /* Settings.bundle in Resources */,
 				69656D7D1E861C8D0013F271 /* LaunchScreen.storyboard in Resources */,
 				69656D7A1E861C8D0013F271 /* Assets.xcassets in Resources */,
 				69656D781E861C8C0013F271 /* Main.storyboard in Resources */,
@@ -163,6 +170,7 @@
 				69656D711E861C8C0013F271 /* AppDelegate.swift in Sources */,
 				696135E41E863AA7007EF922 /* SettingsViewController.swift in Sources */,
 				696135E21E86391C007EF922 /* RegisterViewController.swift in Sources */,
+				40B045841EA2CFA400B3F5DB /* Extensions.swift in Sources */,
 				69B721E71E8E01D500EE43EF /* UIViewController+CoreData.swift in Sources */,
 				69B721E01E8870F800EE43EF /* TotalViewController.swift in Sources */,
 				69B721DE1E88662C00EE43EF /* ListShoppingTableViewController.swift in Sources */,

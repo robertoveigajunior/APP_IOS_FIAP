@@ -26,7 +26,7 @@ class CustomNavigationController: UINavigationController , UIAlertViewDelegate {
         self.navigationBar.tintColor = itemColor
         self.navigationBar.isTranslucent = false
         
-        UIToolbar.appearance().tintColor = itemColor
+        UIToolbar.appearance().tintColor = primaryColor
         //UITabBar.
     }
     
