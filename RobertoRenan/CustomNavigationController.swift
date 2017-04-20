@@ -12,7 +12,7 @@ class CustomNavigationController: UINavigationController , UIAlertViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
                
-        let primaryColor = #colorLiteral(red: 0.0117072789, green: 0.6241955757, blue: 0.9112529159, alpha: 1)
+        let primaryColor = UIColor.primary
         let itemColor = UIColor.white
         
         var dict = Dictionary<String, UIColor>()
@@ -27,7 +27,6 @@ class CustomNavigationController: UINavigationController , UIAlertViewDelegate {
         self.navigationBar.isTranslucent = false
         
         UIToolbar.appearance().tintColor = primaryColor
-        //UITabBar.
     }
     
     override var preferredStatusBarStyle : UIStatusBarStyle {

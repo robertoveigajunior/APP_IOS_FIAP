@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum Constants: String {
-    case COTACAODOLAR = "cotacaodolar"
-    case IOF = "iof"
+class Constants {
+    let COTACAODOLAR = "cotacaodolar"
+    let IOF = "iof"
 }

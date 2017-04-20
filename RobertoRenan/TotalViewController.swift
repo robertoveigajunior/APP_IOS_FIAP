@@ -37,19 +37,19 @@ class TotalViewController: UIViewController {
         }
     }
     
-    func dolarTotal() -> String {
-        let total = String(dataSource.map({$0.price}).reduce(0,+))
+    func dolarTotal() -> Double {
+        let total = dataSource.map({$0.price}).reduce(0,+)
         return total
     }
     
-    func realTotal() -> String {
+    func realTotal() -> Double {
         let dolar = UserDefaults.standard.double(forKey: SettingsType.dolar.rawValue)
-        let total = String((dataSource.map({$0.price}).reduce(0,+))*dolar)
+        let total = (dataSource.map({$0.price}).reduce(0,+))*dolar
         return total
     }
     
     func setLabels() {
-        tfDolarTotal.text = dolarTotal()
-        tfRealTotal.text = realTotal()
+        tfDolarTotal.text = dolarTotal().currencyDolar
+        tfRealTotal.text = realTotal().currencyReal
     }
 }

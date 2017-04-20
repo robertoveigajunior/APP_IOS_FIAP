@@ -79,8 +79,12 @@ extension SettingsViewController {
         tfIOF.inputAccessoryView = toolbar
     }
     
+    func alertValidate(_ name:String, _ tax:String) -> Bool {
+        return (!name.isEmpty && !tax.isEmpty)
+    }
+    
     func newState() {
-        let state = State(context: context)
+        
         let alert = UIAlertController(title: "Novo", message: "Novo Estado", preferredStyle: .alert)
         
         alert.addTextField { (textField) in
@@ -93,14 +97,22 @@ extension SettingsViewController {
         }
         
         let okAction = UIAlertAction(title: "Salvar", style: .default) { (action) in
-            state.name = alert.textFields![0].text
-            state.tax = Double(alert.textFields![1].text!)!
-            do {
-                try self.context.save()
-                self.loadStates()
-            } catch {
-                let alert = UIAlertController(title: "", message: "", preferredStyle: .alert)
-                self.present(alert,animated: true, completion: nil)
+            if self.alertValidate(alert.textFields![0].text!,alert.textFields![1].text!) {
+                let state = State(context: self.context)
+                state.name = alert.textFields![0].text
+                state.tax = Double(alert.textFields![1].text!)!
+                do {
+                    try self.context.save()
+                    self.loadStates()
+                } catch {
+                    let alert = UIAlertController(title: "", message: "", preferredStyle: .alert)
+                    self.present(alert,animated: true, completion: nil)
+                }
+            } else {
+                let alert = UIAlertController(title: "Atenção", message: "Todos os campos são obrigatórios.", preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
+                alert.addAction(action)
+                self.present(alert, animated: false, completion: nil)
             }
         }
         

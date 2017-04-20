@@ -22,6 +22,7 @@ class RegisterViewController: UIViewController {
     var dataSource: [State]!
     var hasCreditCard = false
     var smallImage = UIImage()
+    var product: Product?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +35,7 @@ class RegisterViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        isEdit()
         loadStates()
     }
 
@@ -42,7 +44,11 @@ class RegisterViewController: UIViewController {
     }
     
     @IBAction func saveProduct(_ sender: UIBarButtonItem) {
-        saveNewProduct()
+        if product == nil {
+            newProduct()
+        } else {
+            editProduct()
+        }
     }
     
     @IBAction func getImage(_ sender: UIButton) {
@@ -76,6 +82,15 @@ extension RegisterViewController: UITextFieldDelegate {
 
 //MARK: - Methods
 extension RegisterViewController {
+    func isEdit() {
+        if product != nil {
+            tfNameProduct.text = product!.name
+            imgProduct.image = product!.image as! UIImage!
+            tfPurchaseState.text = product!.state?.name
+            tfPrice.text = String(product!.price)
+        }
+    }
+    
     func selectPicture(sourceType: UIImagePickerControllerSourceType) {
         let imagePicker = UIImagePickerController()
         imagePicker.sourceType = sourceType
@@ -96,8 +111,10 @@ extension RegisterViewController {
     }
     
     func done() {
+        if dataSource.count > 0 {
         tfPurchaseState.text = dataSource[pickerView.selectedRow(inComponent: 0)].name
-        stateSelected = dataSource[pickerView.selectedRow(inComponent: 0)]
+        stateSelected = dataSource[pickerView.selectedRow(inComponent: 0)] as State
+        }
         cancel()
     }
     
@@ -119,13 +136,26 @@ extension RegisterViewController {
         tfPurchaseState.inputAccessoryView = toolBar
     }
     
-    func saveNewProduct() {
+    func newProduct() {
         if validator() {
             do {
                 try context.save()
                 navigationController!.popViewController(animated: true)
             } catch {
                 print("Algo errado ao salvar Produto")
+            }
+        }
+    }
+    
+    func editProduct() {
+        if tfNameProduct.text == product!.name {
+            if let name = tfNameProduct.text {
+                product!.name = name
+            }
+        }
+        if stateSelected == product!.state! {
+            if let state = stateSelected {
+                product!.state = state
             }
         }
     }
@@ -152,16 +182,22 @@ extension RegisterViewController {
             product.image = image
         }
         if let purchaseState = stateSelected {
-            product.states = purchaseState
+            product.state = purchaseState
         }
         if tfPrice.text != "" {
             if hasCreditCard {
                 product.price = (Double(tfPrice.text!)?.addIof(iof: iof))!
             } else {
-                product.price = Double(tfPrice.text!)!
+                if let price = Double(tfPrice.text!) {
+                    product.price = price
+                }
             }
             product.price = product.price.addTax(tax: tax)
         }
+    }
+    
+    func stateValid() -> Bool {
+        return true
     }
     
     func isValid() -> Bool {
@@ -182,12 +218,16 @@ extension RegisterViewController {
         return true
     }
     
+    func showAlert() {
+        let alert = UIAlertController(title: "Atenção", message: "Preencha todos os campos", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
+        alert.addAction(okAction)
+        present(alert, animated: true, completion: nil)
+    }
+    
     func validator() -> Bool {
         if !isValid() {
-            let alert = UIAlertController(title: "Atenção", message: "Preencha todos os campos", preferredStyle: .alert)
-            let okAction = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
-            alert.addAction(okAction)
-            present(alert, animated: true, completion: nil)
+            showAlert()
             return false
         } else {
             buildProduct()
@@ -218,12 +258,6 @@ extension RegisterViewController: UIPickerViewDelegate {
                     forComponent component: Int) -> String? {
         let item = dataSource[row].name
         return item
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int,
-                    inComponent component: Int) {
-        tfPurchaseState.text = dataSource[row].name
-        stateSelected = dataSource[row] as State
     }
 }
 

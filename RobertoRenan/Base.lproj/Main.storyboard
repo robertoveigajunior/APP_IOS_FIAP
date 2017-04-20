@@ -53,10 +53,13 @@
                         <barButtonItem key="backBarButtonItem" title=" " id="YpK-7E-a1V"/>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="A0f-fh-c21">
                             <connections>
-                                <segue destination="Sro-Nf-bNS" kind="show" id="PhL-0X-RV3"/>
+                                <segue destination="Sro-Nf-bNS" kind="show" id="peP-1D-H29"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <segue destination="Sro-Nf-bNS" kind="show" identifier="sgEditProduct" id="Z0d-mz-eZp"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gok-s9-b3i" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -493,5 +496,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="g8k-5R-z2f"/>
+        <segue reference="Z0d-mz-eZp"/>
     </inferredMetricsTieBreakers>
 </document>
