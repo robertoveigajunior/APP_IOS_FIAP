@@ -31,9 +31,13 @@ class SettingsViewController: UIViewController {
         tfDolarQuote.tintColor = .black
         tfIOF.tintColor = .black
         setToolBar()
-        loadStates()
         loadTax()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        loadStates()
+    }
+    
     @IBAction func addNewState(_ sender: UIButton) {
         newState()
     }
@@ -56,6 +60,7 @@ extension SettingsViewController {
     }
     
     func loadStates() {
+        isEmptyList(true)
         dataSource.removeAll()
         let fetchRequest: NSFetchRequest<State> = State.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
@@ -63,6 +68,12 @@ extension SettingsViewController {
         do {
             try dataSource = context.fetch(fetchRequest)
             tableView.reloadData()
+            if dataSource.count > 0 {
+                isEmptyList(false)
+            } else {
+                isEmptyList(true)
+            }
+            
         } catch {
             print("erro")
         }
@@ -72,7 +83,7 @@ extension SettingsViewController {
         toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 44))
         let btCancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let btEdit = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
+        let btEdit = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(edit))
         
         toolbar.items = [btCancel,space,btEdit]
         tfDolarQuote.inputAccessoryView = toolbar
@@ -80,13 +91,62 @@ extension SettingsViewController {
     }
     
     func alertValidate(_ name:String, _ tax:String) -> Bool {
-        return (!name.isEmpty && !tax.isEmpty)
+        var valid : Bool {
+            if (!name.isEmpty && !tax.isEmpty) {
+                if let _ = Double(tax) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return false
+            }
+        }
+        return valid
+    }
+    
+    func editState(item: State) {
+        let alert = UIAlertController(title: "Editar", message: "Editar Estado", preferredStyle: .alert)
+        alert.addTextField { (textField) in
+            textField.placeholder = "Nome"
+            textField.text = item.name
+        }
+        
+        alert.addTextField { (textField) in
+            textField.placeholder = "Taxa de Imposto"
+            textField.keyboardType = .decimalPad
+            textField.text = "\(item.tax)"
+        }
+        
+        let okAction = UIAlertAction(title: "Salvar", style: .default) { (action) in
+            if self.alertValidate(alert.textFields![0].text!,alert.textFields![1].text!) {
+                item.name = alert.textFields![0].text
+                if let taxState = Double(alert.textFields![1].text!) {
+                    item.tax = taxState
+                    do {
+                        try self.context.save()
+                        self.loadStates()
+                    } catch {
+                        
+                    }
+                }
+                
+            } else {
+                self.loadStates()
+                self.alertRequired()
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancelar", style: .cancel, handler: nil)
+        
+        alert.addAction(okAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true, completion: nil)
     }
     
     func newState() {
-        
         let alert = UIAlertController(title: "Novo", message: "Novo Estado", preferredStyle: .alert)
-        
         alert.addTextField { (textField) in
             textField.placeholder = "Nome"
         }
@@ -100,19 +160,19 @@ extension SettingsViewController {
             if self.alertValidate(alert.textFields![0].text!,alert.textFields![1].text!) {
                 let state = State(context: self.context)
                 state.name = alert.textFields![0].text
-                state.tax = Double(alert.textFields![1].text!)!
-                do {
-                    try self.context.save()
-                    self.loadStates()
-                } catch {
-                    let alert = UIAlertController(title: "", message: "", preferredStyle: .alert)
-                    self.present(alert,animated: true, completion: nil)
+                if let taxState = Double(alert.textFields![1].text!) {
+                    state.tax = taxState
+                    do {
+                        try self.context.save()
+                        self.loadStates()
+                    } catch {
+                        
+                    }
                 }
+                
             } else {
-                let alert = UIAlertController(title: "Atenção", message: "Todos os campos são obrigatórios.", preferredStyle: .alert)
-                let action = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
-                alert.addAction(action)
-                self.present(alert, animated: false, completion: nil)
+                self.loadStates()
+                self.alertRequired()
             }
         }
         
@@ -122,6 +182,24 @@ extension SettingsViewController {
         alert.addAction(cancelAction)
         
         present(alert, animated: true, completion: nil)
+    }
+    
+    func alertInvalid() {
+        let alert = UIAlertController(title: "Atenção",
+                                      message: "Não foi possível salvar, pois a taxa de Imposto está incorreta.",
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
+        alert.addAction(action)
+        self.present(alert, animated: false, completion: nil)
+    }
+    
+    func alertRequired() {
+        let alert = UIAlertController(title: "Atenção",
+                                      message: "Não foi possível salvar, pois todos os campos são obrigatórios.",
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
+        alert.addAction(action)
+        self.present(alert, animated: false, completion: nil)
     }
     
     func cancel() {
@@ -164,6 +242,10 @@ extension SettingsViewController: UITableViewDelegate {
         }
         return [deleteAction]
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        editState(item: dataSource[indexPath.row])
+    }
 }
 
 extension SettingsViewController: UITableViewDataSource {
@@ -173,6 +255,7 @@ extension SettingsViewController: UITableViewDataSource {
             isEmptyList(true)
             return 0
         } else {
+            isEmptyList(false)
             return listCount
         }
     }

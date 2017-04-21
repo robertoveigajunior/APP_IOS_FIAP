@@ -38,13 +38,29 @@ class TotalViewController: UIViewController {
     }
     
     func dolarTotal() -> Double {
-        let total = dataSource.map({$0.price}).reduce(0,+)
+        var items = [Double]()
+        for item in dataSource {
+            var price = item.price
+            if item.iof {
+                price = price.addIof
+            }
+            items.append(price.addTax(tax: (item.state?.tax)!))
+        }
+        let total = items.reduce(0,+)
         return total
     }
     
     func realTotal() -> Double {
         let dolar = UserDefaults.standard.double(forKey: SettingsType.dolar.rawValue)
-        let total = (dataSource.map({$0.price}).reduce(0,+))*dolar
+        var items = [Double]()
+        for item in dataSource {
+            var price = item.price
+            if item.iof {
+                price = price.addIof
+            }
+            items.append(price.addTax(tax: (item.state?.tax)!))
+        }
+        let total = items.reduce(0,+)*dolar
         return total
     }
     

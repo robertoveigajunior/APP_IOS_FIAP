@@ -30,16 +30,22 @@ extension UIColor {
 }
 
 extension Double {
-    func addIof(iof: Double) -> Double {
-        let total = self + (self*iof/100)
-        return total
+    private func currencyFormatter(value: Double, identifier: CurrencyType?) -> String {
+        let formatter = NumberFormatter()
+        if identifier != nil {
+            formatter.numberStyle = .currency
+            formatter.locale = Locale(identifier: identifier!.rawValue)
+        }else {
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 2
+        }
+        return formatter.string(from: NSNumber(floatLiteral: value))!
     }
     
-    private func currencyFormatter(value: Double, identifier: String) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale(identifier: identifier)
-        return formatter.string(from: NSNumber(floatLiteral: value))!
+    var addIof: Double {
+        let iof = UserDefaults.standard.double(forKey: SettingsType.iof.rawValue)
+        let total = self + (self*iof/100)
+        return total
     }
     
     func addTax(tax: Double) -> Double {
@@ -47,12 +53,16 @@ extension Double {
         return total
     }
     
+    var currency: String {
+        return currencyFormatter(value: self, identifier: nil)
+    }
+    
     var currencyDolar: String {
-        return currencyFormatter(value: self, identifier: CurrencyType.dolar.rawValue)
+        return currencyFormatter(value: self, identifier: .dolar)
     }
     
     var currencyReal: String {
-        return currencyFormatter(value: self, identifier: CurrencyType.real.rawValue)
+        return currencyFormatter(value: self, identifier: .real)
         
     }
 }

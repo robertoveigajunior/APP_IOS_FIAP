@@ -87,7 +87,7 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="camera-photo" translatesAutoresizingMaskIntoConstraints="NO" id="DYr-8n-prg">
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="camera-photo" translatesAutoresizingMaskIntoConstraints="NO" id="DYr-8n-prg">
                                         <rect key="frame" x="16" y="46" width="343" height="190"/>
                                         <color key="backgroundColor" red="0.0015390543939999999" green="0.67545944700000005" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
@@ -140,6 +140,9 @@
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KwJ-TL-UtA">
                                         <rect key="frame" x="16" y="46" width="343" height="190"/>
+                                        <state key="normal">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
                                         <connections>
                                             <action selector="getImage:" destination="Sro-Nf-bNS" eventType="touchUpInside" id="vkI-L2-8Be"/>
                                         </connections>
@@ -192,6 +195,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="imgProduct" destination="DYr-8n-prg" id="hy0-QH-rSr"/>
+                        <outlet property="swIOF" destination="gQh-UH-2BC" id="MzJ-wR-yip"/>
                         <outlet property="tfNameProduct" destination="ZLn-nV-OCI" id="VDu-Tw-b6Y"/>
                         <outlet property="tfPrice" destination="yvZ-Z6-Ui0" id="Fjf-Vh-s2S"/>
                         <outlet property="tfPurchaseState" destination="pzg-o0-Ez2" id="EbR-Uq-jZZ"/>
@@ -489,7 +493,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="camera-photo" width="128" height="128"/>
+        <image name="camera-photo" width="180" height="180"/>
         <image name="cart-alt" width="32" height="32"/>
         <image name="pie-chart" width="32" height="32"/>
         <image name="settings-alt" width="32" height="32"/>

@@ -15,6 +15,7 @@ class RegisterViewController: UIViewController {
     @IBOutlet weak var tfPurchaseState: UITextField!
     @IBOutlet weak var tfPrice: UITextField!
     @IBOutlet weak var imgProduct: UIImageView!
+    @IBOutlet weak var swIOF: UISwitch!
     
     var pickerView: UIPickerView!
     var stateSelected: State?
@@ -23,9 +24,14 @@ class RegisterViewController: UIViewController {
     var hasCreditCard = false
     var smallImage = UIImage()
     var product: Product?
+    var toolbar = UIToolbar()
+    
+    var iof: Double!
+    var tax: Double!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setToolBar()
         pickerView = UIPickerView()
         tfPurchaseState.delegate = self
         pickerView.delegate = self
@@ -37,6 +43,7 @@ class RegisterViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         isEdit()
         loadStates()
+        
     }
 
     @IBAction func withCreditCard(_ sender: UISwitch) {
@@ -44,15 +51,11 @@ class RegisterViewController: UIViewController {
     }
     
     @IBAction func saveProduct(_ sender: UIBarButtonItem) {
-        if product == nil {
-            newProduct()
-        } else {
-            editProduct()
-        }
+        saveProduct()
     }
     
     @IBAction func getImage(_ sender: UIButton) {
-        let alert = UIAlertController(title: "Selecionar imagem", message: "Como você deseja escolher a imagem", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Selecionar imagem", message: "Como você deseja escolher a imagem?", preferredStyle: .actionSheet)
         
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             let cameraAction = UIAlertAction(title: "Câmera", style: .default) { (action: UIAlertAction) in
@@ -87,7 +90,8 @@ extension RegisterViewController {
             tfNameProduct.text = product!.name
             imgProduct.image = product!.image as! UIImage!
             tfPurchaseState.text = product!.state?.name
-            tfPrice.text = String(product!.price)
+            tfPrice.text = product!.price.currency
+            swIOF.isOn = product!.iof
         }
     }
     
@@ -98,16 +102,19 @@ extension RegisterViewController {
         present(imagePicker, animated: true, completion: nil)
     }
     
-    override var canBecomeFirstResponder: Bool {
-        return true
+    func setToolBar() {
+        toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 44))
+        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let btEdit = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(cancel))
+        
+        toolbar.items = [space,btEdit]
+        tfNameProduct.inputAccessoryView = toolbar
+        tfPrice.inputAccessoryView = toolbar
     }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.becomeFirstResponder()
-    }
-    
     func cancel() {
         tfPurchaseState.resignFirstResponder()
+        tfNameProduct.resignFirstResponder()
+        tfPrice.resignFirstResponder()
     }
     
     func done() {
@@ -136,26 +143,13 @@ extension RegisterViewController {
         tfPurchaseState.inputAccessoryView = toolBar
     }
     
-    func newProduct() {
+    func saveProduct() {
         if validator() {
             do {
                 try context.save()
                 navigationController!.popViewController(animated: true)
             } catch {
                 print("Algo errado ao salvar Produto")
-            }
-        }
-    }
-    
-    func editProduct() {
-        if tfNameProduct.text == product!.name {
-            if let name = tfNameProduct.text {
-                product!.name = name
-            }
-        }
-        if stateSelected == product!.state! {
-            if let state = stateSelected {
-                product!.state = state
             }
         }
     }
@@ -174,60 +168,61 @@ extension RegisterViewController {
     }
     
     func buildProduct() {
-        let iof = UserDefaults.standard.double(forKey: SettingsType.iof.rawValue)
-        let tax = dataSource[pickerView.selectedRow(inComponent: 0)].tax
-        let product = Product(context: context)
-        product.name = tfNameProduct.text
+        if product == nil {
+            product = Product(context: context)
+        }
+        product!.name = tfNameProduct.text
         if let image = imageSelected {
-            product.image = image
+            product!.image = image
         }
         if let purchaseState = stateSelected {
-            product.state = purchaseState
+            product!.state = purchaseState
         }
         if tfPrice.text != "" {
-            if hasCreditCard {
-                product.price = (Double(tfPrice.text!)?.addIof(iof: iof))!
-            } else {
-                if let price = Double(tfPrice.text!) {
-                    product.price = price
-                }
-            }
-            product.price = product.price.addTax(tax: tax)
+            product!.price = Double(tfPrice.text!)!
         }
+        product!.iof = swIOF.isOn
+        product!.state = dataSource[pickerView.selectedRow(inComponent: 0)]
     }
     
     func stateValid() -> Bool {
         return true
     }
     
-    func isValid() -> Bool {
+    func isValid() -> (Bool,isDecimal: Bool) {
         if tfNameProduct.text == "" {
-            return false
+            return (false,true)
         }
-        if let _ = imageSelected {
-        } else{
-            return false
+        if imgProduct.image == UIImage(named: "camera-photo") {
+            return (false,true)
         }
-        if let _ = stateSelected {
-        } else {
-            return false
+        if tfPurchaseState.text == "" {
+            return (false,true)
         }
         if tfPrice.text == "" {
-            return false
+            return (false,true)
+        } else {
+            guard let _ = Double(tfPrice.text!) else {
+                return (false,false)
+            }
         }
-        return true
+        return (true,true)
     }
     
-    func showAlert() {
-        let alert = UIAlertController(title: "Atenção", message: "Preencha todos os campos", preferredStyle: .alert)
+    func showAlert(isDecimal: Bool) {
+        var message = "Preencha todos os campos!"
+        if !isDecimal {
+            message = "O campo preço está incorreto!"
+        }
+        let alert = UIAlertController(title: "Atenção", message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
         alert.addAction(okAction)
         present(alert, animated: true, completion: nil)
     }
     
     func validator() -> Bool {
-        if !isValid() {
-            showAlert()
+        if !isValid().0 || !isValid().isDecimal {
+            showAlert(isDecimal: isValid().isDecimal)
             return false
         } else {
             buildProduct()

@@ -37,7 +37,7 @@ class ListShoppingTableViewController: UITableViewController {
     
     func isEmptyList(_ empty: Bool) {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 120, height: 80))
-        label.text = "Sem produtos"
+        label.text = "Sua lista está vazia!"
         label.textAlignment = .center
         label.tintColor = .black
         label.alpha = 0.3
@@ -49,7 +49,12 @@ class ListShoppingTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellProduct", for: indexPath)
         let item = dataSource[indexPath.row]
         cell.textLabel?.text = item.name
-        cell.detailTextLabel?.text = item.price.currencyDolar
+        if item.iof {
+            cell.detailTextLabel?.text = item.price.addIof.addTax(tax: (item.state?.tax)!).currencyDolar
+        }else{
+            cell.detailTextLabel?.text = item.price.addTax(tax: (item.state?.tax)!).currencyDolar
+        }
+        
         if let image = item.image {
             cell.imageView?.image = image as? UIImage
             cell.imageView?.setBorder()
@@ -59,7 +64,7 @@ class ListShoppingTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Deletar") { (action, indexPath) in
-            self.delete(indexPath)
+            self.deleteProduct(indexPath: indexPath)
         }
 
         return [deleteAction]
@@ -81,12 +86,13 @@ extension ListShoppingTableViewController {
         }
     }
     
-    func delete(indexPath: IndexPath) {
-        dataSource.remove(at: indexPath.row)
-        tableView.deleteRows(at: [indexPath], with: .fade)
+    func deleteProduct(indexPath: IndexPath) {
         let product = dataSource[indexPath.row] as Product
         self.context.delete(product)
         try! self.context.save()
+        dataSource.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .fade)
+        loadProducts()
     }
 
     func loadProducts() {
@@ -96,6 +102,11 @@ extension ListShoppingTableViewController {
         do {
             try dataSource = context.fetch(fetchRequest)
             tableView.reloadData()
+            if dataSource.count > 0 {
+                isEmptyList(false)
+            } else {
+                isEmptyList(true)
+            }
         } catch {
             print("erro")
         }
