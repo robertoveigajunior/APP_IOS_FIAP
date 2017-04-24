@@ -16,6 +16,7 @@ class RegisterViewController: UIViewController {
     @IBOutlet weak var tfPrice: UITextField!
     @IBOutlet weak var imgProduct: UIImageView!
     @IBOutlet weak var swIOF: UISwitch!
+    @IBOutlet weak var scrollView: UIScrollView!
     
     var pickerView: UIPickerView!
     var stateSelected: State?
@@ -28,6 +29,7 @@ class RegisterViewController: UIViewController {
     
     var iof: Double!
     var tax: Double!
+    var viewPosition: CGFloat!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,7 +45,6 @@ class RegisterViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         isEdit()
         loadStates()
-        
     }
 
     @IBAction func withCreditCard(_ sender: UISwitch) {
@@ -55,16 +56,20 @@ class RegisterViewController: UIViewController {
     }
     
     @IBAction func getImage(_ sender: UIButton) {
-        let alert = UIAlertController(title: "Selecionar imagem", message: "Como você deseja escolher a imagem?", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Selecionar imagem",
+                                      message: "Como você deseja escolher a imagem?",
+                                      preferredStyle: .actionSheet)
         
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            let cameraAction = UIAlertAction(title: "Câmera", style: .default) { (action: UIAlertAction) in
+            let cameraAction = UIAlertAction(title: "Câmera", style: .default) {
+                (action: UIAlertAction) in
                 self.selectPicture(sourceType: .camera)
             }
             alert.addAction(cameraAction)
         }
         
-        let libraryAction = UIAlertAction(title: "Biblioteca de fotos", style: .default) { (action: UIAlertAction) in
+        let libraryAction = UIAlertAction(title: "Biblioteca de fotos", style: .default) {
+            (action: UIAlertAction) in
             self.selectPicture(sourceType: .photoLibrary)
         }
         alert.addAction(libraryAction)
@@ -80,11 +85,20 @@ class RegisterViewController: UIViewController {
 //MARK: - TextField
 extension RegisterViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
+        scrollView.setContentOffset(CGPoint(x:0,y:0), animated: false)
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        upView(textField: textField)
     }
 }
 
 //MARK: - Methods
 extension RegisterViewController {
+    func upView(textField: UITextField) {
+        scrollView.setContentOffset(CGPoint(x:0,y:80), animated: true)
+    }
+    
     func isEdit() {
         if product != nil {
             tfNameProduct.text = product!.name
@@ -104,10 +118,11 @@ extension RegisterViewController {
     
     func setToolBar() {
         toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 44))
+
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let btEdit = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(cancel))
         
-        toolbar.items = [space,btEdit]
+        toolbar.items = [space, btEdit]
         tfNameProduct.inputAccessoryView = toolbar
         tfPrice.inputAccessoryView = toolbar
     }
@@ -179,7 +194,7 @@ extension RegisterViewController {
             product!.state = purchaseState
         }
         if tfPrice.text != "" {
-            product!.price = Double(tfPrice.text!)!
+            product!.price = Double(tfPrice.text!.replacingOccurrences(of: ",", with: "."))!
         }
         product!.iof = swIOF.isOn
         product!.state = dataSource[pickerView.selectedRow(inComponent: 0)]
@@ -202,7 +217,7 @@ extension RegisterViewController {
         if tfPrice.text == "" {
             return (false,true)
         } else {
-            guard let _ = Double(tfPrice.text!) else {
+            guard let _ = Double(tfPrice.text!.replacingOccurrences(of: ",", with: ".")) else {
                 return (false,false)
             }
         }

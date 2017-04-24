@@ -15,7 +15,7 @@ enum SettingsType: String {
 }
 
 class SettingsViewController: UIViewController {
-
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var tfDolarQuote: UITextField!
     @IBOutlet weak var tfIOF: UITextField!
@@ -82,7 +82,7 @@ extension SettingsViewController {
     func setToolBar() {
         toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 44))
         let btCancel = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
-       let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let btEdit = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(edit))
         
         toolbar.items = [btCancel,space,btEdit]
@@ -114,23 +114,20 @@ extension SettingsViewController {
         
         alert.addTextField { (textField) in
             textField.placeholder = "Taxa de Imposto"
-            textField.keyboardType = .decimalPad
+            textField.keyboardType = .numberPad
             textField.text = "\(item.tax)"
         }
         
         let okAction = UIAlertAction(title: "Salvar", style: .default) { (action) in
             if self.alertValidate(alert.textFields![0].text!,alert.textFields![1].text!) {
                 item.name = alert.textFields![0].text
-                if let taxState = Double(alert.textFields![1].text!) {
+                if let taxState = Double(alert.textFields![1].text!.replacingOccurrences(of: ",", with: ".")) {
                     item.tax = taxState
                     do {
                         try self.context.save()
                         self.loadStates()
-                    } catch {
-                        
-                    }
+                    } catch { }
                 }
-                
             } else {
                 self.loadStates()
                 self.alertRequired()
@@ -157,10 +154,10 @@ extension SettingsViewController {
         }
         
         let okAction = UIAlertAction(title: "Salvar", style: .default) { (action) in
-            if self.alertValidate(alert.textFields![0].text!,alert.textFields![1].text!) {
+            if self.alertValidate(alert.textFields![0].text!,alert.textFields![1].text!.replacingOccurrences(of: ",", with: ".")) {
                 let state = State(context: self.context)
                 state.name = alert.textFields![0].text
-                if let taxState = Double(alert.textFields![1].text!) {
+                if let taxState = Double(alert.textFields![1].text!.replacingOccurrences(of: ",", with: ".")) {
                     state.tax = taxState
                     do {
                         try self.context.save()
@@ -208,11 +205,29 @@ extension SettingsViewController {
     
     func edit() {
         if tfDolarQuote.isFirstResponder {
-            UserDefaults.standard.set(tfDolarQuote.text, forKey: SettingsType.dolar.rawValue)
+            if let dolarQuote = Double((tfDolarQuote.text?.replacingOccurrences(of: ",", with: "."))!) {
+                UserDefaults.standard.set(String(dolarQuote), forKey: SettingsType.dolar.rawValue)
+            } else {
+                let alert = UIAlertController(title: "Atenção",
+                                              message: "Não foi possível salvar, o campo cotação do dolar está incorreto!",
+                                              preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
+                alert.addAction(action)
+                self.present(alert, animated: false, completion: nil)
+            }
             self.becomeFirstResponder()
         }
         if tfIOF.isFirstResponder {
-            UserDefaults.standard.set(tfIOF.text, forKey: SettingsType.iof.rawValue)
+            if let iof = Double((tfIOF.text?.replacingOccurrences(of: ",", with: "."))!) {
+                UserDefaults.standard.set(String(iof), forKey: SettingsType.iof.rawValue)
+            } else {
+                let alert = UIAlertController(title: "Atenção",
+                                              message: "Não foi possível salvar, o campo iof está incorreto!",
+                                              preferredStyle: .alert)
+                let action = UIAlertAction(title: "Ok", style: .destructive, handler: nil)
+                alert.addAction(action)
+                self.present(alert, animated: false, completion: nil)
+            }
             self.becomeFirstResponder()
         }
     }
