@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -22,10 +22,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TkS-Se-hGh">
-                                <rect key="frame" x="1" y="618" width="374" height="49"/>
+                                <rect key="frame" x="0.0" y="618" width="375" height="49"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Roberto e Renan" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mfR-k6-o5H">
-                                        <rect key="frame" x="122" y="14" width="130" height="21"/>
+                                        <rect key="frame" x="121.5" y="14" width="130" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="21" id="II9-3k-Yfp"/>
                                             <constraint firstAttribute="width" constant="130" id="JPB-Cp-y6y"/>
@@ -39,7 +39,7 @@
                                 <constraints>
                                     <constraint firstItem="mfR-k6-o5H" firstAttribute="centerY" secondItem="TkS-Se-hGh" secondAttribute="centerY" id="6JK-t2-GFR"/>
                                     <constraint firstAttribute="height" constant="49" id="6m3-u3-ukj"/>
-                                    <constraint firstItem="mfR-k6-o5H" firstAttribute="centerX" secondItem="TkS-Se-hGh" secondAttribute="centerX" id="gTf-Zu-Dvv"/>
+                                    <constraint firstItem="mfR-k6-o5H" firstAttribute="centerX" secondItem="TkS-Se-hGh" secondAttribute="centerX" constant="-1" id="gTf-Zu-Dvv"/>
                                 </constraints>
                             </view>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shining_mix_wallet" translatesAutoresizingMaskIntoConstraints="NO" id="8HN-Zm-ALp">
@@ -53,7 +53,7 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="8HN-Zm-ALp" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="EoM-y3-XYy"/>
-                            <constraint firstItem="TkS-Se-hGh" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="1" id="c7D-3a-Qgj"/>
+                            <constraint firstItem="TkS-Se-hGh" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="c7D-3a-Qgj"/>
                             <constraint firstItem="8HN-Zm-ALp" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="dGN-2z-xon"/>
                             <constraint firstItem="xb3-aO-Qok" firstAttribute="top" secondItem="TkS-Se-hGh" secondAttribute="bottom" id="r8V-iM-XvQ"/>
                             <constraint firstAttribute="trailing" secondItem="TkS-Se-hGh" secondAttribute="trailing" id="wwA-pV-0jZ"/>

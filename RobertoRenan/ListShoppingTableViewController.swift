@@ -50,7 +50,8 @@ class ListShoppingTableViewController: UITableViewController {
         let item = dataSource[indexPath.row]
         cell.textLabel?.text = item.name
         if item.iof {
-            cell.detailTextLabel?.text = item.price.addIof.addTax(tax: (item.state?.tax)!).currencyDolar
+            let price = item.price.addIof
+            cell.detailTextLabel?.text = price.addTax(tax: (item.state?.tax)!).currencyDolar
         }else{
             cell.detailTextLabel?.text = item.price.addTax(tax: (item.state?.tax)!).currencyDolar
         }
