@@ -49,11 +49,16 @@ class ListShoppingTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellProduct", for: indexPath)
         let item = dataSource[indexPath.row]
         cell.textLabel?.text = item.name
+        
         if item.iof {
             let price = item.price.addIof
-            cell.detailTextLabel?.text = price.addTax(tax: (item.state?.tax)!).currencyDolar
+            if let state = item.state {
+                cell.detailTextLabel?.text = price.addTax(tax: (state.tax)).currencyDolar
+            }
         }else{
-            cell.detailTextLabel?.text = item.price.addTax(tax: (item.state?.tax)!).currencyDolar
+            if let state = item.state {
+                cell.detailTextLabel?.text = item.price.addTax(tax: (state.tax)).currencyDolar
+            }
         }
         
         if let image = item.image {
